@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import math
+from datetime import timedelta, datetime
 import csv
 import analize
 from word import word
@@ -124,11 +126,14 @@ if __name__ == '__main__':
 		counter = 0
 		for row in wordreader:
 			counter += 1
-			if counter > 6:
+			if counter < 6:
+				continue
+			if counter > 12:
 				break
 			w = word(row[0], row[1])
 			heap_node(word_list, w)
 	while word_list.heap_root.word.num_times_correct < 5:
 		w = word_list.heap_root.word
+		time_elapsed = math.log((datetime.now() - w.last_seen).total_seconds())
 		w.guess_word()
 		word_list.heap_root.update()

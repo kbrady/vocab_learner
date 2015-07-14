@@ -1,18 +1,23 @@
 # -*- coding: utf-8 -*-
+import sys
 import os
 import csv
 from datetime import datetime
 
 class word:
-	def __init__(self, text, meaning):
+	def __init__(self, text, meaning, start_guessing=True):
 		self.text = text
 		self.meaning = meaning
 		self.last_seen = None
 		self.num_times_seen = 0
 		self.num_times_correct = 0
-		self.guess_word()
+		if start_guessing:
+			self.guess_word()
 	
 	def __str__(self):
+		return self.text
+	
+	def __repr__(self):
 		return self.text
 	
 	def say(self):
@@ -22,7 +27,7 @@ class word:
 		guess = raw_input(self.meaning + ': ')
 		self.say()
 		if guess != self.text:
-			print self.text
+			display(self.text)
 			self.guess_word(correct=False)
 		else:
 			self.last_seen = datetime.now()
@@ -33,8 +38,8 @@ class word:
 	def evaluate(self, eval_fun):
 		return eval_fun(self)
 
-def read_words(csv_name):
-	return True
+def display(item):
+	print item
 
 if __name__ == '__main__':
 	word_list = []
