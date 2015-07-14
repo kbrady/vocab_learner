@@ -3,7 +3,6 @@ import os
 import csv
 from datetime import datetime
 
-
 class word:
 	def __init__(self, text, meaning):
 		self.text = text
@@ -12,7 +11,6 @@ class word:
 		self.num_times_seen = 0
 		self.num_times_correct = 0
 		self.guess_word()
-		#self.node = heap.heap_node(self)
 	
 	def __str__(self):
 		return self.text
