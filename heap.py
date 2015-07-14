@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import os
+import pickle
 import math
 from datetime import timedelta, datetime
 import csv
@@ -18,6 +20,10 @@ class priority_list:
 		if self.heap_root is None:
 			return []
 		return self.heap_root.get_list()
+	
+	def save(self, savefile):
+		with open(savefile, 'wb') as f:
+			pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
 class heap_node:
 	def __init__(self, parent_heap, word):
@@ -119,21 +125,36 @@ class heap_node:
 				node_list.append(child_list_1.pop(0))
 		return node_list
 
-if __name__ == '__main__':
-	word_list = priority_list()
-	with open('turkish_word_of_the_day.csv', 'rb') as csvfile:
-		wordreader = csv.reader(csvfile, delimiter=',', quotechar='"')
-		counter = 0
-		for row in wordreader:
-			counter += 1
-			if counter < 6:
-				continue
-			if counter > 12:
-				break
-			w = word(row[0], row[1])
-			heap_node(word_list, w)
-	while word_list.heap_root.word.num_times_correct < 5:
-		w = word_list.heap_root.word
-		time_elapsed = math.log((datetime.now() - w.last_seen).total_seconds())
+def add_word(wordreader, word_list):
+	try:
+		pair = wordreader.next()
+		while pair[1] in word_list.word_heap_map:
+			pair = wordreader.next()
+		w = word(pair[0], pair[1])
+		heap_node(word_list, w)
+	except Exception as e:
+		print e
+
+def main(savefile, csv_name):
+	if os.path.exists(savefile):
+		with open(savefile, 'rb') as f:
+			word_list = pickle.load(f)
+	else:
+		word_list = priority_list()
+	csvfile = open(csv_name, 'rb')
+	wordreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+	start = True
+	while start or word_list.heap_root.word.num_times_correct < 5:
+		start = False
+		if word_list.heap_root is None:
+			add_word(wordreader, word_list)
+		h = word_list.heap_root
+		w = h.word
 		w.guess_word()
-		word_list.heap_root.update()
+		h.update()
+		if w.num_times_correct > 3 or len(word_list.word_heap_map) < 4:
+			add_word(wordreader, word_list)
+		word_list.save(savefile)
+
+if __name__ == '__main__':
+	main('turkish.pl', 'turkish_word_of_the_day.csv')
