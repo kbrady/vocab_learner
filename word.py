@@ -8,7 +8,7 @@ class word:
 	def __init__(self, text, meaning, start_guessing=True):
 		self.text = text
 		self.meaning = meaning
-		self.last_seen = None
+		self.last_seen = datetime.now()
 		self.num_times_seen = 0
 		self.num_times_correct = 0
 		if start_guessing:
@@ -23,6 +23,12 @@ class word:
 	def say(self):
 		os.system("say '" + str(self) + "'")
 	
+	def update_stats(self, correct):
+		self.last_seen = datetime.now()
+		self.num_times_seen += 1
+		if correct:
+			self.num_times_correct += 1
+	
 	def guess_word(self, correct=True):
 		guess = raw_input(self.meaning + ': ')
 		self.say()
@@ -30,10 +36,7 @@ class word:
 			display(self.text)
 			self.guess_word(correct=False)
 		else:
-			self.last_seen = datetime.now()
-			self.num_times_seen += 1
-			if correct:
-				self.num_times_correct += 1
+			self.update_stats(correct)
 	
 	def evaluate(self, eval_fun):
 		return eval_fun(self)

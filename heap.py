@@ -130,7 +130,7 @@ def add_word(wordreader, word_list):
 		pair = wordreader.next()
 		while pair[1] in word_list.word_heap_map:
 			pair = wordreader.next()
-		w = word(pair[0], pair[1])
+		w = word(pair[0], pair[1], False)
 		heap_node(word_list, w)
 	except Exception as e:
 		print e
@@ -143,6 +143,9 @@ def main(savefile, csv_name):
 		word_list = priority_list()
 	csvfile = open(csv_name, 'rb')
 	wordreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+	return word_list, wordreader
+
+def run_command_line(word_list, wordreader):
 	start = True
 	while start or word_list.heap_root.word.num_times_correct < 5:
 		start = False
@@ -157,4 +160,5 @@ def main(savefile, csv_name):
 		word_list.save(savefile)
 
 if __name__ == '__main__':
-	main('turkish.pl', 'turkish_word_of_the_day.csv')
+	word_list, wordreader =	main('turkish.pl', 'turkish_word_of_the_day.csv')
+	run_command_line(word_list, wordreader)
