@@ -10,13 +10,12 @@ savefile = None
 
 @app.route('/')
 def home():
-	if word_list.heap_root is None or word_list.heap_root.word.num_times_correct > 3:
-		heap.add_word(wordreader, word_list)
+	root = word_list.get_next(wordreader)
 	word_list.save(savefile)
 	if show_word:
-		return render_template('home.html', meaning=word_list.heap_root.word.meaning, word=unicode(word_list.heap_root.word.text, 'utf-8'))
+		return render_template('home.html', meaning=root.word.meaning, word=unicode(root.word.text, 'utf-8'))
 	else:
-		return render_template('home.html', meaning=word_list.heap_root.word.meaning, word='')
+		return render_template('home.html', meaning=root.word.meaning, word='')
 
 @app.route('/guess', methods=['GET', 'POST'])
 def guess_word():

@@ -1,3 +1,8 @@
 p {
 	text-align: center;
+	font-size: 300%;
+}
+input, form {
+	text-align: center;
+	font-size: 200%;
 }

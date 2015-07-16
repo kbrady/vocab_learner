@@ -24,6 +24,22 @@ class priority_list:
 	def save(self, savefile):
 		with open(savefile, 'wb') as f:
 			pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+	
+	def get_next(self, reader=None):
+		if reader is not None and len(self.word_heap_map) < 3 or self.heap_root.word.correct_last_time:
+			self.add_word(reader)
+		return self.heap_root
+	
+	def add_word(self, wordreader):
+		try:
+			pair = wordreader.next()
+			while pair[1] in self.word_heap_map:
+				pair = wordreader.next()
+			w = word(pair[0], pair[1], False)
+			heap_node(self, w)
+		except Exception as e:
+			print e
+
 
 class heap_node:
 	def __init__(self, parent_heap, word):
@@ -125,16 +141,6 @@ class heap_node:
 				node_list.append(child_list_1.pop(0))
 		return node_list
 
-def add_word(wordreader, word_list):
-	try:
-		pair = wordreader.next()
-		while pair[1] in word_list.word_heap_map:
-			pair = wordreader.next()
-		w = word(pair[0], pair[1], False)
-		heap_node(word_list, w)
-	except Exception as e:
-		print e
-
 def main(savefile, csv_name):
 	if os.path.exists(savefile):
 		with open(savefile, 'rb') as f:
@@ -149,14 +155,10 @@ def run_command_line(word_list, wordreader):
 	start = True
 	while start or word_list.heap_root.word.num_times_correct < 5:
 		start = False
-		if word_list.heap_root is None:
-			add_word(wordreader, word_list)
-		h = word_list.heap_root
+		h = word_list.add_word(wordreader)
 		w = h.word
 		w.guess_word()
 		h.update()
-		if w.num_times_correct > 3 or len(word_list.word_heap_map) < 4:
-			add_word(wordreader, word_list)
 		word_list.save(savefile)
 
 if __name__ == '__main__':

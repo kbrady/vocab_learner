@@ -8,7 +8,9 @@ class word:
 	def __init__(self, text, meaning, start_guessing=True):
 		self.text = text
 		self.meaning = meaning
+		self.first_added = datetime.now()
 		self.last_seen = datetime.now()
+		self.correct_last_time = True
 		self.num_times_seen = 0
 		self.num_times_correct = 0
 		if start_guessing:
@@ -28,6 +30,9 @@ class word:
 		self.num_times_seen += 1
 		if correct:
 			self.num_times_correct += 1
+			self.correct_last_time = True
+		else:
+			self.correct_last_time = False
 	
 	def guess_word(self, correct=True):
 		guess = raw_input(self.meaning + ': ')
