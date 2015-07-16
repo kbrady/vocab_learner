@@ -14,6 +14,7 @@ class priority_list:
 		self.title = title
 		self.word_heap_map = {}
 		self.heap_root = None
+		self.last_returned_value = None
 		self.border = []
 	
 	def get_heap_list(self):
@@ -28,7 +29,25 @@ class priority_list:
 	def get_next(self, reader=None):
 		if reader is not None and len(self.word_heap_map) < 3 or self.heap_root.word.correct_last_time:
 			self.add_word(reader)
-		return self.heap_root
+		if self.heap_root == self.last_returned_value:
+			kids = [x for x in self.heap_root.children if x is not None]
+			if len(kids) == 0:
+				to_return = self.heap_root
+				self.last_returned_value = self.heap_root
+			elif len(kids) == 1:
+				to_return = kids[0]
+				self.last_returned_value = kids[0]
+			else:
+				if kids[0] < kids[1]:
+					to_return = kids[1]
+					self.last_returned_value = kids[1]
+				else:
+					to_return = kids[0]
+					self.last_returned_value = kids[0]
+		else:
+			to_return = self.heap_root
+			self.last_returned_value = self.heap_root
+		return to_return
 	
 	def add_word(self, wordreader):
 		try:
@@ -60,6 +79,9 @@ class heap_node:
 	
 	def __repr__(self):
 		return self.word.__repr__()
+	
+	def __lt__(self, other):
+		return self.word.evaluate(self.parent_heap.eval_fun) < other.word.evaluate(self.parent_heap.eval_fun)
 
 	def percolate(self):
 		if self.parent is not None and self.parent.value < self.value:

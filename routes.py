@@ -7,31 +7,29 @@ show_word = False
 word_list = None
 wordreader = None
 savefile = None
+root = None
 
 @app.route('/')
 def home():
-	root = word_list.get_next(wordreader)
+	global root
 	word_list.save(savefile)
 	if show_word:
 		return render_template('home.html', meaning=root.word.meaning, word=unicode(root.word.text, 'utf-8'))
 	else:
+		root = word_list.get_next(wordreader)
 		return render_template('home.html', meaning=root.word.meaning, word='')
 
 @app.route('/guess', methods=['GET', 'POST'])
 def guess_word():
 	global show_word
 	word_guessed = request.form['guess']
-	print word_guessed, type(word_guessed)
-	w = word_list.heap_root.word
-	print w, w.num_times_correct, w.num_times_seen, type(w.text)
+	w = root.word
 	w.say()
 	if word_guessed == unicode(w.text, 'utf-8'):
-		print 'correct'
 		w.update_stats(not show_word)
-		word_list.heap_root.update()
+		root.update()
 		show_word = False
 	else:
-		print 'wrong'
 		show_word = True
 	return redirect('/')
 	
