@@ -2,7 +2,7 @@
 import random
 import sys
 import unittest
-import analize
+import analyze
 import word
 import heap
 

@@ -4,12 +4,12 @@ import pickle
 import math
 from datetime import timedelta, datetime
 import csv
-import analize
+import analyze
 from word import word
 
 # define the heap
 class priority_list:
-	def __init__(self, eval_fun=analize.evaluate, title='default'):
+	def __init__(self, eval_fun=analyze.evaluate, title='default'):
 		self.eval_fun = eval_fun
 		self.title = title
 		self.word_heap_map = {}

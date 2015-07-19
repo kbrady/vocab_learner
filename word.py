@@ -11,6 +11,8 @@ class word:
 		self.first_added = datetime.now()
 		self.last_seen = datetime.now()
 		self.correct_last_time = True
+		self.longest_streak = 0
+		self.current_streak = 0
 		self.num_times_seen = 0
 		self.num_times_correct = 0
 		if start_guessing:
@@ -30,9 +32,13 @@ class word:
 		self.num_times_seen += 1
 		if correct:
 			self.num_times_correct += 1
+			self.current_streak += 1
+			if self.current_streak > self.longest_streak:
+				self.longest_streak = self.current_streak
 			self.correct_last_time = True
 		else:
 			self.correct_last_time = False
+			self.current_streak = 0
 	
 	def guess_word(self, correct=True):
 		guess = raw_input(self.meaning + ': ')
