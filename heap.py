@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 import os
 import pickle
 import math
@@ -16,6 +17,36 @@ class priority_list:
 		self.heap_root = None
 		self.last_returned_value = None
 		self.border = []
+		self.to_add = []
+	
+	def add_csv_file(self, csv_name):
+		with open(csv_name, 'rb') as csvfile:
+			wordreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+			for row in wordreader:
+				if row[1] not in self.word_heap_map:
+					self.to_add.append(row)
+	
+	def get_all_word_pairs(self):
+		in_heap = [x.get_word_pair() for x in self.word_heap_map.values()]
+		return in_heap + to_add
+	
+	def delete_word(self, text, meaning):
+		if meaning in self.word_heap_map:
+			self.delete_from_heap(meaning)
+		else:
+			self.delete_from_to_add(text, meaning)
+	
+	def delete_from_to_add(self, text, meaning):
+		for i in range(len(self.to_add)):
+			if self.to_add[i][0] == text and self.to_add[i][1]:
+				self.to_add.pop(i)
+				return
+	
+	def delete_from_heap(self, meaning):
+		self.word_heap_map[meaning].delete()
+	
+	def add_word(self, text, meaning):
+		self.to_add.append(text, meaning)
 	
 	def get_heap_list(self):
 		if self.heap_root is None:
@@ -23,12 +54,15 @@ class priority_list:
 		return self.heap_root.get_list()
 	
 	def save(self, savefile):
+		print savefile
 		with open(savefile, 'wb') as f:
 			pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 	
-	def get_next(self, reader=None):
-		if reader is not None and len(self.word_heap_map) < 3 or self.heap_root.word.correct_last_time:
-			self.add_word(reader)
+	def get_next(self):
+		if len(self.to_add) > 0 and (len(self.word_heap_map) < 3 or self.heap_root.word.correct_last_time):
+			self.add_word()
+		if self.heap_root is None:
+			return None
 		if self.heap_root == self.last_returned_value:
 			kids = [x for x in self.heap_root.children if x is not None]
 			if len(kids) == 0:
@@ -49,15 +83,12 @@ class priority_list:
 			self.last_returned_value = self.heap_root
 		return to_return
 	
-	def add_word(self, wordreader):
-		try:
-			pair = wordreader.next()
-			while pair[1] in self.word_heap_map:
-				pair = wordreader.next()
-			w = word(pair[0], pair[1], False)
-			heap_node(self, w)
-		except Exception as e:
-			print e
+	def add_word(self):
+		pair = self.to_add.pop(0)
+		while pair[1] in self.word_heap_map:
+			pair = self.to_add.pop(0)
+		w = word(pair[0], pair[1], False)
+		heap_node(self, w)
 
 
 class heap_node:
@@ -82,6 +113,24 @@ class heap_node:
 	
 	def __lt__(self, other):
 		return self.word.evaluate(self.parent_heap.eval_fun) < other.word.evaluate(self.parent_heap.eval_fun)
+	
+	def get_word_pair(self):
+		return (self.word.text, self.word.meaning)
+	
+	def delete(self):
+		self.value = -sys.maxint
+		self.percolate()
+		del self.parent_heap.word_heap_map[self.word.meaning]
+		if self.parent.children[0] == self:
+			self.parent.children[0] = None
+			self.parent_heap.border.append((self.parent, 0))
+		else:
+			self.parent.children[1] = None
+			self.parent_heap.border.append((self.parent, 1))
+		for i in range(len(self.parent_heap.border)):
+			if self.parent_heap.border[i][0] == self:
+				self.parent_heap.border.pop(i)
+		del self.word
 
 	def percolate(self):
 		if self.parent is not None and self.parent.value < self.value:
@@ -163,15 +212,13 @@ class heap_node:
 				node_list.append(child_list_1.pop(0))
 		return node_list
 
-def main(savefile, csv_name):
+def main(savefile):
 	if os.path.exists(savefile):
 		with open(savefile, 'rb') as f:
 			word_list = pickle.load(f)
 	else:
 		word_list = priority_list()
-	csvfile = open(csv_name, 'rb')
-	wordreader = csv.reader(csvfile, delimiter=',', quotechar='"')
-	return word_list, wordreader
+	return word_list
 
 def run_command_line(word_list, wordreader):
 	start = True
@@ -184,5 +231,6 @@ def run_command_line(word_list, wordreader):
 		word_list.save(savefile)
 
 if __name__ == '__main__':
-	word_list, wordreader =	main('turkish.pl', 'turkish_word_of_the_day.csv')
+	word_list = main('turkish.pl')
+	word_list.add_csv_file('turkish_word_of_the_day.csv')
 	run_command_line(word_list, wordreader)
