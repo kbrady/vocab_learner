@@ -2,15 +2,18 @@
 {% block content %}
 
 <form action="/edit" method=post autocomplete="off">
-<table>
-<th>
-<td>Delete</td>
-<td>Word</td>
-<td>Meaning</td>
-</th>
+<table id='editTable'>
+<thead>
+<tr>
+<th>Delete</th>
+<th>Word</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
 {% for w in words %}
 <tr>
-<td><input type="checkbox" name="{{w.text}}   {{w.meaning}}"></td>
+<td class="delete"><input type="checkbox" name="{{w.text}}   {{w.meaning}}"></td>
 <td>{{w.text}}</td>
 <td>{{w.meaning}}</td>
 </tr>
@@ -20,6 +23,7 @@
 <td><input type="text" name="newWord_text"></td>
 <td><input type="text" name="newWord_meaning"></td>
 </tr>
+</tbody>
 </table>
 <input type="submit" value="submit">
 </form>

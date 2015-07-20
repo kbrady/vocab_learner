@@ -28,7 +28,7 @@ class priority_list:
 	
 	def get_all_word_pairs(self):
 		in_heap = [x.get_word_pair() for x in self.word_heap_map.values()]
-		return in_heap + to_add
+		return in_heap + self.to_add
 	
 	def delete_word(self, text, meaning):
 		if meaning in self.word_heap_map:

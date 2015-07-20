@@ -1,8 +1,13 @@
-p {
-	text-align: center;
+p.large {
 	font-size: 300%;
 }
-input, form {
+.large {
 	text-align: center;
 	font-size: 200%;
+}
+input {
+	text-align: center;
+}
+.delete	{
+	text-align: center;
 }

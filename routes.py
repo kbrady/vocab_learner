@@ -8,6 +8,11 @@ word_list = None
 savefile = None
 root = None
 
+class word_pair:
+	def __init__(self, pair):
+		self.text = unicode(pair[0], 'utf-8')
+		self.meaning = pair[1]
+
 @app.route('/')
 def home():
 	if word_list is None:
@@ -35,11 +40,16 @@ def login_page():
 	else:
 		return redirect('/upload')
 
-@app.route('/edit', methods=['GET', 'POST'])
+@app.route('/edit')
 def edit_page():
 	if word_list is None:
 		return redirect('/login')
-	return render_template('edit.html')
+	word_pairs = [word_pair(x) for x in word_list.get_all_word_pairs()]
+	return render_template('edit.html', words=word_pairs)
+
+@app.route('/edit', methods=['GET', 'POST'])
+def edit():
+	return redirect('/')
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_page():
