@@ -22,16 +22,32 @@ def home():
 			return render_template('home.html', meaning='UPLOAD WORDS', word='')
 		return render_template('home.html', meaning=root.word.meaning, word='')
 
-@app.route('/login')
-def login_page():
-	return render_template('login.html')
-
 @app.route('/login', methods=['GET', 'POST'])
-def login():
+def login_page():
+	if 'user' not in request.form:
+		return render_template('login.html')
 	global word_list
 	global savefile
 	savefile = request.form['user']+'.pl'
 	word_list = heap.main(savefile)
+	if len(word_list.word_heap_map) > 0:
+		return redirect('/')
+	else:
+		return redirect('/upload')
+
+@app.route('/edit', methods=['GET', 'POST'])
+def edit_page():
+	if word_list is None:
+		return redirect('/login')
+	return render_template('edit.html')
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_page():
+	if word_list is None:
+		return redirect('/login')
+	if 'csv_name' not in request.form:
+		return render_template('upload.html')
+	word_list.add_csv_file(request.form['csv_name'])
 	return redirect('/')
 
 @app.route('/guess', methods=['GET', 'POST'])
