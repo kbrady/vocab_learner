@@ -7,11 +7,19 @@ show_word = False
 word_list = None
 savefile = None
 root = None
+tmp_data = None
 
 class word_pair:
-	def __init__(self, pair):
-		self.text = unicode(pair[0], 'utf-8')
+	def __init__(self, index, pair):
+		self.text = pair[0]
 		self.meaning = pair[1]
+		self.index = index
+	
+	def __repr__(self):
+		return str((self.index, self.text, self.meaning))
+	
+	def __str__(self):
+		return self.__repr__()
 
 @app.route('/')
 def home():
@@ -20,7 +28,7 @@ def home():
 	global root
 	word_list.save(savefile)
 	if show_word:
-		return render_template('home.html', meaning=root.word.meaning, word=unicode(root.word.text, 'utf-8'))
+		return render_template('home.html', meaning=root.word.meaning, word=root.word.text)
 	else:
 		root = word_list.get_next()
 		if root is None:
@@ -42,14 +50,35 @@ def login_page():
 
 @app.route('/edit')
 def edit_page():
+	global tmp_data
 	if word_list is None:
 		return redirect('/login')
-	word_pairs = [word_pair(x) for x in word_list.get_all_word_pairs()]
-	return render_template('edit.html', words=word_pairs)
+	wp = word_list.get_all_word_pairs()
+	tmp_data = [word_pair(i, wp[i]) for i in range(len(wp))]
+	return render_template('edit.html', words=tmp_data)
 
 @app.route('/edit', methods=['GET', 'POST'])
 def edit():
-	return redirect('/')
+	global tmp_data
+	print 'started'
+	for i in range(len(tmp_data)):
+		delete = request.form.get('delete_' + str(i), False)
+		text = request.form.get('text_' + str(i), tmp_data[i].text)
+		meaning = request.form.get('meaning_' + str(i), tmp_data[i].meaning)
+		if delete:
+			word_list.delete_word(tmp_data[i].text, tmp_data[i].meaning)
+		if text != tmp_data[i].text or meaning != tmp_data[i].meaning:
+			word_list.change_word(text, meaning, tmp_data[i].text, tmp_data[i].meaning)
+	print 'to while'
+	i = 1
+	while request.form.get('text_new_' + str(i), False):
+		text = request.form['text_new_' + str(i)]
+		meaning = request.form['meaning_new_' + str(i)]
+		if len(text) > 0 and len(meaning) > 0:
+			word_list.add_to_add(text, meaning)
+		i += 1
+	print 'complete'
+	return edit_page()
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_page():
@@ -66,7 +95,7 @@ def guess_word():
 	word_guessed = request.form['guess']
 	w = root.word
 	w.say()
-	if word_guessed == unicode(w.text, 'utf-8'):
+	if word_guessed == w.text:
 		w.update_stats(not show_word)
 		root.update()
 		show_word = False

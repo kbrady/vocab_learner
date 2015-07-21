@@ -13,15 +13,15 @@
 <tbody>
 {% for w in words %}
 <tr>
-<td class="delete"><input type="checkbox" name="{{w.text}}   {{w.meaning}}"></td>
-<td>{{w.text}}</td>
-<td>{{w.meaning}}</td>
+<td class="delete"><input type="checkbox" name="delete_{{w.index}}"></td>
+<td><input type="text" value="{{w.text}}" name="text_{{w.index}}"></td>
+<td><input type="text" value="{{w.meaning}}" name="meaning_{{w.index}}"></td>
 </tr>
 {% endfor %}
 <tr>
 <td></td>
-<td><input type="text" name="newWord_text"></td>
-<td><input type="text" name="newWord_meaning"></td>
+<td><input type="text" name="text_new_1"></td>
+<td><input type="text" name="meaning_new_1"></td>
 </tr>
 </tbody>
 </table>

@@ -23,8 +23,18 @@ class priority_list:
 		with open(csv_name, 'rb') as csvfile:
 			wordreader = csv.reader(csvfile, delimiter=',', quotechar='"')
 			for row in wordreader:
-				if row[1] not in self.word_heap_map:
-					self.to_add.append(row)
+				self.add_to_add(row[0], row[1])
+	
+	def add_to_add(self, text, meaning):
+		if meaning not in self.word_heap_map:
+			if type(text) == unicode:
+				pair = (text, meaning) 
+			else:
+				pair = (unicode(text, 'utf-8'), meaning) 
+			if pair not in self.to_add:
+				self.to_add.append(pair)
+		elif text != self.word_heap_map[meaning].word.text:
+			print "Does " + meaning + " mean " + text + " or " + self.word_heap_map[meaning].word.text
 	
 	def get_all_word_pairs(self):
 		in_heap = [x.get_word_pair() for x in self.word_heap_map.values()]
@@ -36,6 +46,16 @@ class priority_list:
 		else:
 			self.delete_from_to_add(text, meaning)
 	
+	def change_word(self, new_text, new_meaning, old_text, old_meaning):
+		if old_meaning in self.word_heap_map:
+			self.word_heap_map[old_meaning].update_word(new_text, new_meaning)
+			return
+		for i in range(len(self.to_add)):
+			pair = self.to_add[i]
+			if pair[0] == old_text and pair[1] == old_meaning:
+				self.to_add[i] = (new_text, new_meaning)
+				return
+	
 	def delete_from_to_add(self, text, meaning):
 		for i in range(len(self.to_add)):
 			if self.to_add[i][0] == text and self.to_add[i][1]:
@@ -44,9 +64,6 @@ class priority_list:
 	
 	def delete_from_heap(self, meaning):
 		self.word_heap_map[meaning].delete()
-	
-	def add_word(self, text, meaning):
-		self.to_add.append(text, meaning)
 	
 	def get_heap_list(self):
 		if self.heap_root is None:
@@ -117,19 +134,29 @@ class heap_node:
 	def get_word_pair(self):
 		return (self.word.text, self.word.meaning)
 	
+	def update_word(self, new_text, new_meaning):
+		self.word.text = new_text
+		self.word.meaning = new_meaning
+	
 	def delete(self):
 		self.value = -sys.maxint
 		self.percolate()
 		del self.parent_heap.word_heap_map[self.word.meaning]
-		if self.parent.children[0] == self:
-			self.parent.children[0] = None
-			self.parent_heap.border.append((self.parent, 0))
+		if self.parent is not None:
+			if self.parent.children[0] == self:
+				self.parent.children[0] = None
+				self.parent_heap.border.append((self.parent, 0))
+			else:
+				self.parent.children[1] = None
+				self.parent_heap.border.append((self.parent, 1))
 		else:
-			self.parent.children[1] = None
-			self.parent_heap.border.append((self.parent, 1))
-		for i in range(len(self.parent_heap.border)):
+			self.parent_heap.heap_root = None
+		i = 0
+		while i < len(self.parent_heap.border):
 			if self.parent_heap.border[i][0] == self:
 				self.parent_heap.border.pop(i)
+			else:
+				i += 1
 		del self.word
 
 	def percolate(self):
