@@ -25,7 +25,7 @@ class word:
 		return self.text
 	
 	def say(self):
-		os.system("say '" + str(self) + "'")
+		os.system("say '" + self.text.encode('utf-8') + "'")
 	
 	def update_stats(self, correct):
 		self.last_seen = datetime.now()
