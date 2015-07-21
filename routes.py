@@ -60,7 +60,6 @@ def edit_page():
 @app.route('/edit', methods=['GET', 'POST'])
 def edit():
 	global tmp_data
-	print 'started'
 	for i in range(len(tmp_data)):
 		delete = request.form.get('delete_' + str(i), False)
 		text = request.form.get('text_' + str(i), tmp_data[i].text)
@@ -69,7 +68,6 @@ def edit():
 			word_list.delete_word(tmp_data[i].text, tmp_data[i].meaning)
 		if text != tmp_data[i].text or meaning != tmp_data[i].meaning:
 			word_list.change_word(text, meaning, tmp_data[i].text, tmp_data[i].meaning)
-	print 'to while'
 	i = 1
 	while request.form.get('text_new_' + str(i), False):
 		text = request.form['text_new_' + str(i)]
@@ -77,7 +75,6 @@ def edit():
 		if len(text) > 0 and len(meaning) > 0:
 			word_list.add_to_add(text, meaning)
 		i += 1
-	print 'complete'
 	return edit_page()
 
 @app.route('/upload', methods=['GET', 'POST'])

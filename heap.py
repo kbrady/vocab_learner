@@ -71,7 +71,6 @@ class priority_list:
 		return self.heap_root.get_list()
 	
 	def save(self, savefile):
-		print savefile
 		with open(savefile, 'wb') as f:
 			pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 	

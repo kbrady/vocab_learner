@@ -20,7 +20,6 @@ class TestWord(unittest.TestCase):
 		for i in range(2000):
 			w.guess_word()
 		self.assertEqual(2001, w.num_times_seen)
-		print abs(float(w.num_times_correct)/w.num_times_seen - .5)
 		self.assertEqual(True, abs(float(w.num_times_correct)/w.num_times_seen - .5) < .03)
 		word.raw_input = lambda x: raw_input(x)
 
