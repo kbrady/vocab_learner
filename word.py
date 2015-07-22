@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import platform
 import sys
 import os
 import csv
@@ -25,7 +26,10 @@ class word:
 		return self.text
 	
 	def say(self):
-		os.system("say '" + self.text.encode('utf-8') + "'")
+		if platform.platform().find('Darwin') == 0:
+			os.system("say '" + self.text.encode('utf-8') + "'")
+		else:
+			os.system("echo '" + self.text.encode('utf-8') + "' | ptts")
 	
 	def update_stats(self, correct):
 		self.last_seen = datetime.now()
