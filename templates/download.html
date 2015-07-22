@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<form action="/download" method=post autocomplete="off">
+file name: <input type="text" name="filename" value="{{username}}.csv" autofocus>
+<br/>
+<input type="submit" value="submit">
+</form>
+
+{% endblock %}

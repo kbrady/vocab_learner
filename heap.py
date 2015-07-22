@@ -25,6 +25,12 @@ class priority_list:
 			for row in wordreader:
 				self.add_to_add(row[0], row[1])
 	
+	def write_words_to_csv(self, filename):
+		with open(filename, 'wb') as csvfile:
+			wordwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+			for pair in self.get_all_word_pairs():
+				wordwriter.writerow([pair[0].encode('utf-8'), pair[1]])
+	
 	def add_to_add(self, text, meaning):
 		if meaning not in self.word_heap_map:
 			if type(text) == unicode:
@@ -38,7 +44,9 @@ class priority_list:
 	
 	def get_all_word_pairs(self):
 		in_heap = [x.get_word_pair() for x in self.word_heap_map.values()]
-		return in_heap + self.to_add
+		full_list = in_heap + self.to_add
+		full_list.sort()
+		return full_list
 	
 	def delete_word(self, text, meaning):
 		if meaning in self.word_heap_map:

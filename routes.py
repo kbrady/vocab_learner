@@ -75,6 +75,7 @@ def edit():
 		if len(text) > 0 and len(meaning) > 0:
 			word_list.add_to_add(text, meaning)
 		i += 1
+	word_list.save(savefile)
 	return edit_page()
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -86,8 +87,20 @@ def upload_page():
 	word_list.add_csv_file(request.form['csv_name'])
 	return redirect('/')
 
+@app.route('/download', methods=['GET', 'POST'])
+def download_csv_page():
+	if word_list is None:
+		return redirect('/login')
+	if not request.form.get('filename', False):
+		print savefile
+		return render_template('download.html', username=savefile[:-3])
+	word_list.write_words_to_csv(request.form['filename'])
+	return redirect('/')
+
 @app.route('/guess', methods=['GET', 'POST'])
 def guess_word():
+	if word_list is None or request.form.get('guess', True):
+		return redirect('/login')
 	global show_word
 	word_guessed = request.form['guess']
 	w = root.word
