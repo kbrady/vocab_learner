@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, render_template, request, jsonify, Markup, redirect, url_for
-import heap
+import leitner
 
 app = Flask(__name__)
 show_word = False
@@ -25,7 +25,7 @@ class word_pair:
 def home():
 	if word_list is None:
 		return redirect('/login')
-	if len(word_list.word_heap_map) + len(word_list.to_add) == 0:
+	if len(word_list.word_card_map) + len(word_list.to_add) == 0:
 		return redirect('/upload')
 	global root
 	global show_word
@@ -45,10 +45,12 @@ def home():
 		else:
 			show_word = True
 	word_list.save(savefile)
+	print word_list.boxes
+	completed = word_list.completed()
 	if show_word:
-		return render_template('home.html', meaning=root.word.meaning, word=root.word.text)
+		return render_template('home.html', meaning=root.word.meaning, word=root.word.text, completed=completed)
 	else:
-		return render_template('home.html', meaning=root.word.meaning, word='')
+		return render_template('home.html', meaning=root.word.meaning, word='', completed=completed)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
@@ -56,8 +58,8 @@ def login_page():
 		return render_template('login.html')
 	global word_list
 	global savefile
-	savefile = request.form['user']+'.pl'
-	word_list = heap.main(savefile)
+	savefile = request.form['user']+'.deck'
+	word_list = leitner.main(savefile)
 	return redirect('/')
 
 @app.route('/edit')

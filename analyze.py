@@ -14,4 +14,4 @@ def correct_score(word):
 		return 50.0
 
 def streak_score(word):
-	return 1.0 / ((word.current_streak + 1) * (word.longest_streak + 1))
+	return 1.0 / (((word.current_streak + 1) * (word.longest_streak + 1)) ** .5)

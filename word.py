@@ -23,7 +23,7 @@ class word:
 		return self.text
 	
 	def __repr__(self):
-		return self.text
+		return self.text.encode('utf-8')
 	
 	def say(self):
 		if platform.platform().find('Darwin') == 0:

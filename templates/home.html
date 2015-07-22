@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
 {% block content %}
 
+{% if completed %}
+<p class="large">Congradulations! You learned all the words!</p>
+{% endif %}
+
 <p class="large">{{meaning}}</p>
 <p class="large">{{word}}</p>
 <form class="large"	action="/" method=post autocomplete="off">
