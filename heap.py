@@ -83,7 +83,7 @@ class priority_list:
 			pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 	
 	def get_next(self):
-		if len(self.to_add) > 0 and (len(self.word_heap_map) < 3 or self.heap_root.word.correct_last_time):
+		if len(self.to_add) > 0 and (len(self.word_heap_map) < 3 or self.heap_root.word.longest_streak > 5):
 			self.add_word()
 		if self.heap_root is None:
 			return None

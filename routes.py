@@ -25,7 +25,7 @@ class word_pair:
 def home():
 	if word_list is None:
 		return redirect('/login')
-	if len(word_list.word_heap_map) == 0:
+	if len(word_list.word_heap_map) + len(word_list.to_add) == 0:
 		return redirect('/upload')
 	global root
 	global show_word
