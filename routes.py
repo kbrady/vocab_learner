@@ -45,7 +45,6 @@ def home():
 		else:
 			show_word = True
 	word_list.save(savefile)
-	print word_list.boxes
 	completed = word_list.completed()
 	if show_word:
 		return render_template('home.html', meaning=root.word.meaning, word=root.word.text, completed=completed)

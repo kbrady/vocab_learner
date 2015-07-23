@@ -6,6 +6,7 @@ import math
 from datetime import timedelta, datetime
 import csv
 import analyze
+import random
 from word import word
 
 # define the deck
@@ -29,6 +30,7 @@ class deck:
 			wordreader = csv.reader(csvfile, delimiter=',', quotechar='"')
 			for row in wordreader:
 				self.add_to_add(row[0], row[1])
+		random.shuffle(self.to_add)
 	
 	def write_words_to_csv(self, filename):
 		with open(filename, 'wb') as csvfile:
@@ -91,10 +93,14 @@ class deck:
 		if len(self.word_card_map) == 0:
 			return None
 		while len(self.next_up) == 0:
+			# only review the final box once per two hour period
+			if self.num_boxes == len(self.boxes) and max([datetime.now() - c.word.last_seen for c in self.boxes[-1]]) < timedelta(hours=2):
+				self.num_boxes = 1
 			self.next_up = [val for sublist in self.boxes[:self.num_boxes] for val in sublist]
 			self.num_boxes = self.num_boxes + 1
 			if self.num_boxes > len(self.boxes):
 				self.num_boxes = 1
+			random.shuffle(self.next_up)
 		return self.next_up.pop(0)
 	
 	def add_word(self):
@@ -137,7 +143,7 @@ class card:
 		else:
 			if self.box_index == 0:
 				return
-			new_index = self.box_index - 1
+			new_index = 0
 		self.parent_deck.boxes[self.box_index].remove(self)
 		self.box_index = new_index
 		self.parent_deck.boxes[self.box_index].append(self)
