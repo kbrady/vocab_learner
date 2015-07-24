@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, request, jsonify, Markup, redirect, url_for
+from flask import Flask, render_template, request, jsonify, Markup, redirect, url_for, session
 import leitner
 
 app = Flask(__name__)
-show_word = False
+app.secret_key = 'wporiu;lskdjfvxoiuelrnsx ;klvjcopa'
 word_list = None
 savefile = None
 root = None
@@ -28,28 +28,28 @@ def home():
 	if len(word_list.word_card_map) + len(word_list.to_add) == 0:
 		return redirect('/upload')
 	global root
-	global show_word
+	completed = word_list.completed()
 	if root is None:
 		root = word_list.get_next()
-		show_word = False
-		return render_template('home.html', meaning=root.word.meaning, word='')
-	if request.form.get('guess', False) != False:
+		session['show_word'] = False
+		return render_template('home.html', meaning=root.word.meaning, word='', completed=completed, lang='tr-TR')
+	to_say = ''
+	if 'guess' in request.form:
 		word_guessed = request.form['guess']
 		w = root.word
-		w.say()
+		to_say = w.text
 		if word_guessed == w.text:
-			w.update_stats(not show_word)
+			w.update_stats(not session.get('show_word',False))
 			root.update()
 			root = word_list.get_next()
-			show_word = False
+			session['show_word'] = False
 		else:
-			show_word = True
+			session['show_word'] = True
 	word_list.save(savefile)
-	completed = word_list.completed()
-	if show_word:
-		return render_template('home.html', meaning=root.word.meaning, word=root.word.text, completed=completed)
+	if session.get('show_word', False):
+		return render_template('home.html', meaning=root.word.meaning, word=root.word.text, completed=completed, say=to_say, lang='tr-TR')
 	else:
-		return render_template('home.html', meaning=root.word.meaning, word='', completed=completed)
+		return render_template('home.html', meaning=root.word.meaning, word='', completed=completed, say=to_say, lang='tr-TR')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
