@@ -11,14 +11,14 @@ from word import word
 
 # define the deck
 class deck:
-	def __init__(self, eval_fun=analyze.evaluate, title='default'):
-		self.eval_fun = eval_fun
-		self.title = title
+	def __init__(self, lang='tr-TR', savefile=None):
+		self.lang = lang
 		self.word_card_map = {}
 		self.boxes = [[] for i in range(5)]
 		self.num_boxes = 1
 		self.next_up = []
 		self.to_add = []
+		self.savefile = savefile
 	
 	def completed(self):
 		if len(self.to_add) == 0 and sum([len(b) for b in self.boxes[:(len(self.boxes)-1)]]) == 0:
@@ -83,7 +83,9 @@ class deck:
 	def get_deck_list(self):
 		return [val for sublist in self.boxes for val in sublist]
 	
-	def save(self, savefile):
+	def save(self, savefile=None):
+		if savefile is None:
+			savefile = self.savefile
 		with open(savefile, 'wb') as f:
 			pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 	
@@ -148,10 +150,11 @@ class card:
 		self.box_index = new_index
 		self.parent_deck.boxes[self.box_index].append(self)
 	
-def main(savefile):
+def main(savefile, lang):
 	if os.path.exists(savefile):
 		with open(savefile, 'rb') as f:
 			word_list = pickle.load(f)
+			word_list.savefile = savefile
 	else:
-		word_list = deck()
+		word_list = deck(lang)
 	return word_list

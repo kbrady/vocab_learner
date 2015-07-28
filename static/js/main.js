@@ -1,13 +1,12 @@
 $(function () {
-//	var msg = new SpeechSynthesisUtterance('Hello World');
-//    window.speechSynthesis.speak(msg);
-//	speechSynthesis.getVoices().forEach(function(voice) {
-//		console.log(voice.name, voice.default ? '(default)' :'', voice.lang);
-//	});
 	$('#editTable').tableScroll({
 		scrollHeight: 250
 	});
 });
+
+function get_lang() {
+	return speechSynthesis.getVoices().map(function(voice) { return voice.lang }).filter(function(val,index,self) { return self.indexOf(val) === index });
+}
 
 function say(text, lang) {
 	var msg = new SpeechSynthesisUtterance(text);

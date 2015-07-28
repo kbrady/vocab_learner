@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, request, jsonify, Markup, redirect, url_for, session
+from flask import Flask, render_template, request, jsonify, Markup, redirect, url_for
 import leitner
 
 app = Flask(__name__)
-app.secret_key = 'wporiu;lskdjfvxoiuelrnsx ;klvjcopa'
+show_word = False
 word_list = None
 savefile = None
 root = None
 tmp_data = None
+languages = ["en-US", "it-IT", "sv-SE", "fr-CA", "de-DE", "he-IL", "tr-TR", "id-ID", "en-GB", "es-AR", "nl-BE", "en-scotland", "ro-RO", "pt-PT", "th-TH", "en-AU", "ja-JP", "sk-SK", "hi-IN", "pt-BR", "hu-HU", "zh-TW", "el-GR", "ru-RU", "en-IE", "es-ES", "nb-NO", "es-MX", "da-DK", "fi-FI", "zh-HK", "ar-SA", "en-ZA", "fr-FR", "zh-CN", "en-IN", "nl-NL", "ko-KR", "pl-PL", "cs-CZ"]
 
 class word_pair:
 	def __init__(self, index, pair):
@@ -28,33 +29,34 @@ def home():
 	if len(word_list.word_card_map) + len(word_list.to_add) == 0:
 		return redirect('/upload')
 	global root
+	global show_word
 	completed = word_list.completed()
 	if root is None:
 		root = word_list.get_next()
-		session['show_word'] = False
-		return render_template('home.html', meaning=root.word.meaning, word='', completed=completed, lang='tr-TR')
+		show_word = False
+		return render_template('home.html', meaning=root.word.meaning, word='', completed=completed, lang=word_list.lang)
 	to_say = ''
 	if 'guess' in request.form:
 		word_guessed = request.form['guess']
 		w = root.word
 		to_say = w.text
 		if word_guessed == w.text:
-			w.update_stats(not session.get('show_word',False))
+			w.update_stats(not show_word)
 			root.update()
 			root = word_list.get_next()
-			session['show_word'] = False
+			show_word = False
 		else:
-			session['show_word'] = True
+			show_word = True
 	word_list.save(savefile)
-	if session.get('show_word', False):
-		return render_template('home.html', meaning=root.word.meaning, word=root.word.text, completed=completed, say=to_say, lang='tr-TR')
+	if not show_word:
+		return render_template('home.html', meaning=root.word.meaning, word=root.word.text, completed=completed, say=to_say, lang=word_list.lang)
 	else:
-		return render_template('home.html', meaning=root.word.meaning, word='', completed=completed, say=to_say, lang='tr-TR')
+		return render_template('home.html', meaning=root.word.meaning, word='', completed=completed, say=to_say, lang=word_list.lang)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
 	if 'user' not in request.form:
-		return render_template('login.html')
+		return render_template('login.html', languages=languages)
 	global word_list
 	global savefile
 	savefile = request.form['user']+'.deck'
