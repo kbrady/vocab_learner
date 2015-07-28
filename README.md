@@ -1,4 +1,4 @@
-# vocab_learner
+# Vocabulary Learner
 ## Python script which uses Google's text to speech to teach vocabulary incorporating audio
 
 How to use:
