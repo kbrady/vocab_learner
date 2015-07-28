@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, render_template, request, jsonify, Markup, redirect, url_for
 import leitner
+import glob
 
 app = Flask(__name__)
 show_word = False
@@ -55,10 +56,16 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
 	if 'user' not in request.form:
-		return render_template('login.html', languages=languages)
+		saved_files = glob.glob('*.deck')
+		saved_files = [x[:x.rfind('.')] for x in saved_files]
+		return render_template('login.html', languages=languages, saved_files = saved_files)
+	return login(request.form['user'], request.form['lang'])
+
+@app.route('/login/<user_name>', methods=['GET', 'POST'])
+def login(user_name, lang='tr-TR'):
 	global word_list
-	savefile = request.form['user']+'.deck'
-	word_list = leitner.main(savefile, request.form['lang'])
+	savefile = user_name+'.deck'
+	word_list = leitner.main(savefile, lang)
 	return redirect('/')
 
 @app.route('/edit')

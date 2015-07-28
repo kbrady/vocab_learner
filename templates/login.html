@@ -1,9 +1,18 @@
 {% extends "layout.html" %}
 {% block content %}
 
+<h4>Continue From a Previous Lesson:</h4>
+
+<ul id="saved_lessons">
+{% for user_name in saved_files %}
+<li><a href="/login/{{user_name}}">{{user_name}}</a></li>
+{% endfor %}
+</ul>
+
+<h4>Or Start a New Lesson</h4>
 <form action="/login" method=post autocomplete="off">
-user name: <input type="text" name="user" autofocus>
-voice: <select id="lang_list" name="lang">
+lesson name: <input type="text" name="user" autofocus>
+voice language: <select id="lang_list" name="lang">
 {% for l in languages %}
 	<option value="{{l}}">{{l}}</option>
 {% endfor %}

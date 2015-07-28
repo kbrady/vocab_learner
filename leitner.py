@@ -150,7 +150,7 @@ class card:
 		self.box_index = new_index
 		self.parent_deck.boxes[self.box_index].append(self)
 	
-def main(savefile, lang):
+def main(savefile, lang='tr-TR'):
 	if os.path.exists(savefile):
 		with open(savefile, 'rb') as f:
 			word_list = pickle.load(f)
