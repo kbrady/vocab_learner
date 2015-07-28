@@ -5,7 +5,6 @@ import leitner
 app = Flask(__name__)
 show_word = False
 word_list = None
-savefile = None
 root = None
 tmp_data = None
 languages = ["en-US", "it-IT", "sv-SE", "fr-CA", "de-DE", "he-IL", "tr-TR", "id-ID", "en-GB", "es-AR", "nl-BE", "en-scotland", "ro-RO", "pt-PT", "th-TH", "en-AU", "ja-JP", "sk-SK", "hi-IN", "pt-BR", "hu-HU", "zh-TW", "el-GR", "ru-RU", "en-IE", "es-ES", "nb-NO", "es-MX", "da-DK", "fi-FI", "zh-HK", "ar-SA", "en-ZA", "fr-FR", "zh-CN", "en-IN", "nl-NL", "ko-KR", "pl-PL", "cs-CZ"]
@@ -47,8 +46,8 @@ def home():
 			show_word = False
 		else:
 			show_word = True
-	word_list.save(savefile)
-	if not show_word:
+	word_list.save()
+	if show_word:
 		return render_template('home.html', meaning=root.word.meaning, word=root.word.text, completed=completed, say=to_say, lang=word_list.lang)
 	else:
 		return render_template('home.html', meaning=root.word.meaning, word='', completed=completed, say=to_say, lang=word_list.lang)
@@ -58,9 +57,8 @@ def login_page():
 	if 'user' not in request.form:
 		return render_template('login.html', languages=languages)
 	global word_list
-	global savefile
 	savefile = request.form['user']+'.deck'
-	word_list = leitner.main(savefile)
+	word_list = leitner.main(savefile, request.form['lang'])
 	return redirect('/')
 
 @app.route('/edit')
@@ -90,7 +88,7 @@ def edit():
 		if len(text) > 0 and len(meaning) > 0:
 			word_list.add_to_add(text, meaning)
 		i += 1
-	word_list.save(savefile)
+	word_list.save()
 	return edit_page()
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -107,7 +105,7 @@ def download_csv_page():
 	if word_list is None:
 		return redirect('/login')
 	if not request.form.get('filename', False):
-		return render_template('download.html', username=savefile[:-3])
+		return render_template('download.html', username=word_list.savefile[:rfind('.')])
 	word_list.write_words_to_csv(request.form['filename'])
 	return redirect('/')
 
