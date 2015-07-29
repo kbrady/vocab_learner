@@ -116,5 +116,15 @@ def download_csv_page():
 	word_list.write_words_to_csv(request.form['filename'])
 	return redirect('/')
 
+@app.route('/language', methods=['GET', 'POST'])
+def language_page():
+	if word_list is None:
+		return redirect('/login')
+	if 'lang' not in request.form:
+		return render_template('language.html', languages = languages)
+	word_list.lang = request.form['lang']
+	word_list.save()
+	return redirect('/')
+
 if __name__ == '__main__':
 	app.run(debug=True, host='0.0.0.0')

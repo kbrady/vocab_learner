@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h4>Choose a Language for Answers to be Read in:</h4>
+<form action="/language" method=post autocomplete="off">
+voice language: <select id="lang_list" name="lang">
+{% for l in languages %}
+	<option value="{{l}}">{{l}}</option>
+{% endfor %}
+</select>
+<br/>
+<input type="submit" value="submit">
+</form>
+
+{% endblock %}
