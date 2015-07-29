@@ -112,7 +112,7 @@ def download_csv_page():
 	if word_list is None:
 		return redirect('/login')
 	if not request.form.get('filename', False):
-		return render_template('download.html', username=word_list.savefile[:rfind('.')])
+		return render_template('download.html', username=word_list.savefile[:word_list.savefile.rfind('.')])
 	word_list.write_words_to_csv(request.form['filename'])
 	return redirect('/')
 
