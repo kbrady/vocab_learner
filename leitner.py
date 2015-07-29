@@ -89,6 +89,21 @@ class deck:
 		with open(savefile, 'wb') as f:
 			pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 	
+	def review(self, card):
+		if len(self.next_up) == 0:
+			next_card = self.get_next()
+			if next_card == card:
+				self.next_up = [card]
+				return
+			self.next_up = [next_card, card] + self.next_up
+			return
+		if len(self.next_up) == 1:
+			if self.next_up[0] == card:
+				return
+			self.next_up.append(card)
+			return
+		self.next_up = [self.next_up[0], card] + self.next_up[1:]
+	
 	def get_next(self):
 		if len(self.to_add) > 0 and len(self.boxes[0]) == 0:
 			self.add_word()
@@ -143,9 +158,10 @@ class card:
 				return
 			new_index = self.box_index + 1
 		else:
+			self.parent_deck.review(self)
 			if self.box_index == 0:
 				return
-			new_index = 0
+			new_index = self.box_index - 1
 		self.parent_deck.boxes[self.box_index].remove(self)
 		self.box_index = new_index
 		self.parent_deck.boxes[self.box_index].append(self)
