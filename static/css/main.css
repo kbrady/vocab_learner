@@ -11,3 +11,20 @@ input {
 .delete	{
 	text-align: center;
 }
+#navbar {
+	display: block;
+}
+#navbar li {
+	float: left;
+	display: block;
+	padding: 1px;
+	margin: 1px;
+	background-color: #900090;
+}
+#navbar li:hover {
+	background-color: #b000b0;
+}
+#navbar li a {
+	color: #ffffff;
+	text-decoration: none;
+}
