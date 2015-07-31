@@ -1,30 +1,69 @@
 p.large {
 	font-size: 300%;
 }
+h1 {
+	color: #E44424;
+	text-align: center;
+}
+div.container {
+	padding: 3px;
+	text-align: center;
+	border: solid 3px #A2AB58;
+	background-color: #67BCDB;
+}
+body {
+	color: #fff;
+}
+form {
+	text-align: center;
+}
+input {
+	color: #000;
+	text-align: center;
+}
+select {
+	color: #000;
+}
+ul li {
+	display: block;
+}
+ul li a {
+	color: #E44424;
+	text-decoration: none;
+}
+ul li a:hover {
+	color: #fff;
+}
+#editTable {
+	background-color: #fff;
+	border: solid 2px #E44424;
+	color: #E44424;
+}
 .large {
 	text-align: center;
 	font-size: 200%;
-}
-input {
-	text-align: center;
 }
 .delete	{
 	text-align: center;
 }
 #navbar {
-	display: block;
+	display: table;
+	margin: 0;
+	auto;
 }
 #navbar li {
-	float: left;
-	display: block;
-	padding: 1px;
-	margin: 1px;
-	background-color: #900090;
-}
-#navbar li:hover {
-	background-color: #b000b0;
+	display: inline;
 }
 #navbar li a {
 	color: #ffffff;
 	text-decoration: none;
+	padding: 3px;
+	margin: 2px;
+	background-color: #A2AB58;
+	border: solid 3px;
+	border-color: #67BCDB;
+}
+#navbar li a:hover {
+	background-color: #fff;
+	color: #A2AB58;
 }

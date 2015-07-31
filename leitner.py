@@ -161,7 +161,7 @@ class card:
 			self.parent_deck.review(self)
 			if self.box_index == 0:
 				return
-			new_index = self.box_index - 1
+			new_index = max(self.box_index - 2, 0)
 		self.parent_deck.boxes[self.box_index].remove(self)
 		self.box_index = new_index
 		self.parent_deck.boxes[self.box_index].append(self)
