@@ -47,9 +47,8 @@ ul li a:hover {
 	text-align: center;
 }
 #navbar {
-	display: table;
+	text-align: center;
 	margin: 0;
-	auto;
 }
 #navbar li {
 	display: inline;
