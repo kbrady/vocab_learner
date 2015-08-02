@@ -22,6 +22,18 @@ class word_pair:
 	def __str__(self):
 		return self.__repr__()
 
+class word_progress:
+	def __init__(self, text, box='', times_seen=0, times_correct=0, longest_streak=0, last_seen=None):
+		self.text = text
+		self.box = box
+		self.times_seen = times_seen
+		self.times_correct = times_correct
+		self.longest_streak = longest_streak
+		if last_seen is None:
+			self.last_seen = 'Never'
+		else:
+			self.last_seen = 'Sometime'
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
 	if word_list is None:
@@ -125,6 +137,14 @@ def language_page():
 	word_list.lang = request.form['lang']
 	word_list.save()
 	return redirect('/')
+
+@app.route('/progress')
+def progress_page():
+	if word_list is None:
+		return redirect('/login')
+	seen_words = [word_progress(x.word.text, x.box_index+1, x.word.num_times_seen, x.word.num_times_correct, x.word.longest_streak, x.word.last_seen) for x in word_list.get_deck_list()]
+	unseen_words = [word_progress(x[0]) for x in word_list.to_add]
+	return render_template('progress.html', words = seen_words + unseen_words)
 
 if __name__ == '__main__':
 	app.run(debug=True, host='0.0.0.0')

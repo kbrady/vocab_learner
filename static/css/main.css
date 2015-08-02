@@ -39,6 +39,12 @@ ul li a:hover {
 	border: solid 2px #E44424;
 	color: #E44424;
 }
+#editTable th {
+	color: #E44424;
+}
+#editTable tr {
+	color: #000;
+}
 .large {
 	text-align: center;
 	font-size: 200%;

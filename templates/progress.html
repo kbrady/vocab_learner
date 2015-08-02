@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div id='edit_div'>
+<table id='editTable'>
+<thead>
+<tr>
+<th>Word</th>
+<th>Box</th>
+<th>Number of Times Seen</th>
+<th>Number of Times Correct</th>
+<th>Longest Streak</th>
+<th>Last Seen</th>
+</tr>
+</thead>
+<tbody>
+{% for w in words %}
+<tr>
+<td>{{w.text}}</td>
+<td>{{w.box}}</td>
+<td>{{w.times_seen}}</td>
+<td>{{w.times_correct}}</td>
+<td>{{w.longest_streak}}</td>
+<td>{{w.last_seen}}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+<input type="submit" value="submit">
+</form>
+
+{% endblock %}
