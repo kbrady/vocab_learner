@@ -111,7 +111,7 @@ class deck:
 			return None
 		while len(self.next_up) == 0:
 			# only review the final box once per two hour period
-			if self.num_boxes == len(self.boxes) and max([datetime.now() - c.word.last_seen for c in self.boxes[-1]]) < timedelta(hours=2):
+			if self.num_boxes == len(self.boxes) and len(self.boxes[-1]) > 0 and sum([len(self.boxes[i]) for i in range(len(self.boxes)-1)]) > 0 and max([datetime.now() - c.word.last_seen for c in self.boxes[-1]]) < timedelta(hours=2):
 				self.num_boxes = 1
 			self.next_up = [val for sublist in self.boxes[:self.num_boxes] for val in sublist]
 			self.num_boxes = self.num_boxes + 1
@@ -172,5 +172,5 @@ def main(savefile, lang='tr-TR'):
 			word_list = pickle.load(f)
 			word_list.savefile = savefile
 	else:
-		word_list = deck(lang)
+		word_list = deck(lang, savefile)
 	return word_list
