@@ -39,19 +39,16 @@ class deck:
 				wordwriter.writerow([pair[0].encode('utf-8'), pair[1]])
 	
 	def add_to_add(self, text, meaning):
-		if meaning not in self.word_card_map:
-			if type(text) == unicode:
-				pair = (text, meaning) 
-			else:
-				pair = (unicode(text, 'utf-8'), meaning) 
-			if pair not in self.to_add:
-				self.to_add.append(pair)
-		elif text != self.word_card_map[meaning].word.text:
-			print "Does " + meaning + " mean " + text + " or " + self.word_card_map[meaning].word.text
+		if type(text) == unicode:
+			pair = (text, meaning) 
+		else:
+			pair = (unicode(text, 'utf-8'), meaning) 
+		if pair not in self.to_add:
+			self.to_add.append(pair)
 	
 	def get_all_word_pairs(self):
 		in_deck = [x.get_word_pair() for x in self.word_card_map.values()]
-		full_list = in_deck + self.to_add
+		full_list = in_deck + [(x[0], x[1], 0) for x in self.to_add]
 		full_list.sort()
 		return full_list
 	
@@ -111,8 +108,13 @@ class deck:
 			return None
 		while len(self.next_up) == 0:
 			# only review the final box once per two hour period
-			if self.num_boxes == len(self.boxes) and len(self.boxes[-1]) > 0 and sum([len(self.boxes[i]) for i in range(len(self.boxes)-1)]) > 0 and max([datetime.now() - c.word.last_seen for c in self.boxes[-1]]) < timedelta(hours=2):
-				self.num_boxes = 1
+			if self.num_boxes == len(self.boxes)-1:
+				self.next_up = [val for sublist in self.boxes[:-1] for val in sublist]
+				# if there are some words in the earlier boxes or there are a few words which haven't been seen in two hours
+				if len(self.next_up) > 0 or max([datetime.now() - c.word.last_seen for c in self.boxes[-1]]) >= timedelta(hours=2):
+					self.next_up += [c for c in self.boxes[-1] if (datetime.now() - c.word.last_seen) >= timedelta(hours=2)]
+				else:
+					self.next_up += self.boxes[-1]
 			self.next_up = [val for sublist in self.boxes[:self.num_boxes] for val in sublist]
 			self.num_boxes = self.num_boxes + 1
 			if self.num_boxes > len(self.boxes):
@@ -123,6 +125,8 @@ class deck:
 	def add_word(self):
 		pair = self.to_add.pop(0)
 		while pair[1] in self.word_card_map:
+			if pair[1] != self.word_card_map[pair[1]]:
+				self.to_add.append((pair[0],pair[1] + ' 2'))
 			if len(self.to_add) == 0:
 				return
 			pair = self.to_add.pop(0)
@@ -141,7 +145,7 @@ class card:
 		return self.word.__repr__()
 	
 	def get_word_pair(self):
-		return (self.word.text, self.word.meaning)
+		return (self.word.text, self.word.meaning, self.word.num_times_seen)
 	
 	def edit_word(self, new_text, new_meaning):
 		self.word.text = new_text
@@ -149,6 +153,7 @@ class card:
 	
 	def delete(self):
 		self.parent_deck.boxes[self.box_index].remove(self)
+		self.parent.next_up = [x for x in self.parent.next_up if x != self]
 		del self.parent_deck.word_card_map[self.word.meaning]
 		del self.word
 

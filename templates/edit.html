@@ -9,6 +9,7 @@
 <th>Delete</th>
 <th>Word</th>
 <th>Meaning</th>
+<th>Times Seen</th>
 </tr>
 </thead>
 <tbody>
@@ -17,6 +18,7 @@
 <td class="delete"><input type="checkbox" name="delete_{{w.index}}"></td>
 <td><input type="text" value="{{w.text}}" name="text_{{w.index}}"></td>
 <td><input type="text" value="{{w.meaning}}" name="meaning_{{w.index}}"></td>
+<td>{{w.times_seen}}</td>
 </tr>
 {% endfor %}
 <tr>
