@@ -108,17 +108,17 @@ class deck:
 			return None
 		while len(self.next_up) == 0:
 			# only review the final box once per two hour period
-			if self.num_boxes == len(self.boxes)-1:
+			if self.num_boxes >= len(self.boxes):
 				self.next_up = [val for sublist in self.boxes[:-1] for val in sublist]
 				# if there are some words in the earlier boxes or there are a few words which haven't been seen in two hours
 				if len(self.next_up) > 0 or max([datetime.now() - c.word.last_seen for c in self.boxes[-1]]) >= timedelta(hours=2):
 					self.next_up += [c for c in self.boxes[-1] if (datetime.now() - c.word.last_seen) >= timedelta(hours=2)]
 				else:
 					self.next_up += self.boxes[-1]
-			self.next_up = [val for sublist in self.boxes[:self.num_boxes] for val in sublist]
-			self.num_boxes = self.num_boxes + 1
-			if self.num_boxes > len(self.boxes):
 				self.num_boxes = 1
+			else:
+				self.next_up = [val for sublist in self.boxes[:self.num_boxes] for val in sublist]
+				self.num_boxes = self.num_boxes + 1
 			random.shuffle(self.next_up)
 		return self.next_up.pop(0)
 	
