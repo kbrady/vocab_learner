@@ -70,7 +70,7 @@ class deck:
 	
 	def delete_from_to_add(self, text, meaning):
 		for i in range(len(self.to_add)):
-			if self.to_add[i][0] == text and self.to_add[i][1]:
+			if self.to_add[i][0] == text and self.to_add[i][1] == meaning:
 				self.to_add.pop(i)
 				return
 	
@@ -101,8 +101,11 @@ class deck:
 			return
 		self.next_up = [self.next_up[0], card] + self.next_up[1:]
 	
+	def num_words_with_low_streak(self):
+		return len([x for x in self.word_card_map.values() if x.word.current_streak < 2*len(self.boxes)])
+	
 	def get_next(self):
-		if len(self.to_add) > 0 and len(self.boxes[0]) == 0:
+		if len(self.to_add) > 0 and len(self.boxes[0]) == 0 and self.num_words_with_low_streak() < 15:
 			self.add_word()
 		if len(self.word_card_map) == 0:
 			return None
