@@ -102,7 +102,7 @@ class deck:
 		self.next_up = [self.next_up[0], card] + self.next_up[1:]
 	
 	def num_words_with_low_streak(self):
-		return len([x for x in self.word_card_map.values() if x.word.current_streak < 2*len(self.boxes)])
+		return len([x for x in self.word_card_map.values() if x.word.current_streak < 1+len(self.boxes)])
 	
 	def get_next(self):
 		if len(self.to_add) > 0 and len(self.boxes[0]) == 0 and self.num_words_with_low_streak() < 15:
