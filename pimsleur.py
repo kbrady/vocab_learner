@@ -98,7 +98,7 @@ class deck:
 		self.next_up = [self.next_up[0], card] + self.next_up[1:]
 	
 	def num_not_known(self):
-		return len([x for x in self.word_card_map.values() if x.progress <= 6])
+		return len([x for x in self.word_card_map.values() if x.progress <= 5])
 	
 	def get_next(self):
 		if len(self.next_up) == 0:
@@ -154,6 +154,8 @@ class card:
 	def update(self):
 		if self.word.correct_last_time:
 			self.progress += 1
+			if self.progress == len(card.time_steps):
+				self.progress -= 1
 		else:
 			self.progress = 0
 			self.parent_deck.review(self)
