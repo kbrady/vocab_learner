@@ -25,16 +25,25 @@ class word_pair:
 		return self.__repr__()
 
 class word_progress:
-	def __init__(self, text, box='', times_seen=0, times_correct=0, longest_streak=0, last_seen=None):
+	def __init__(self, text, box='', times_seen=0, times_correct=0, longest_streak=0, current_streak=0, last_seen=None, next_schedule=None):
 		self.text = text
 		self.box = box
 		self.times_seen = times_seen
 		self.times_correct = times_correct
 		self.longest_streak = longest_streak
+		self.current_streak = current_streak
 		if last_seen is None:
 			self.last_seen = 'Never'
+			self.next_schedule = 'Never'
 		else:
-			self.last_seen = last_seen.strftime("%d/%m/%y %H:%M:%S %p")
+			self.last_seen = time_to_streak(last_seen)
+			self.next_schedule = time_to_streak(next_schedule)
+
+def time_to_streak(this_time):
+	if datetime.datetime.now() - this_time < datetime.timedelta(days=1):
+		return this_time.strftime("%I:%M %p")
+	else:
+		return this_time.strftime("%b %d")
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -54,7 +63,7 @@ def home():
 		word_guessed = request.form['guess']
 		w = root.word
 		to_say = w.text
-		if word_guessed == w.text:
+		if root.correct(word_guessed):
 			w.update_stats(not show_word)
 			root.update()
 			root = word_list.get_next()
@@ -144,7 +153,7 @@ def language_page():
 def progress_page():
 	if word_list is None:
 		return redirect('/login')
-	seen_words = [word_progress(x.word.text, '', x.word.num_times_seen, x.word.num_times_correct, x.word.longest_streak, x.word.last_seen) for x in word_list.get_deck_list()]
+	seen_words = [word_progress(x.word.text, x.progress+1, x.word.num_times_seen, x.word.num_times_correct, x.word.longest_streak, x.word.current_streak, x.word.last_seen, x.next_schedule) for x in word_list.get_deck_list()]
 	unseen_words = [word_progress(x[0]) for x in word_list.to_add]
 	return render_template('progress.html', words = seen_words + unseen_words)
 
@@ -152,7 +161,7 @@ def progress_page():
 def see_next_up():
 	if word_list is None:
 		return redirect('/login')
-	next_words = [word_progress(x.word.text, '', x.word.num_times_seen, x.word.num_times_correct, x.word.longest_streak, x.word.last_seen) for x in word_list.next_up]
+	next_words = [word_progress(x.word.text, x.progress+1, x.word.num_times_seen, x.word.num_times_correct, x.word.longest_streak, x.word.current_streak, x.word.last_seen, x.next_schedule) for x in word_list.next_up]
 	return render_template('progress.html', words = next_words)
 
 if __name__ == '__main__':

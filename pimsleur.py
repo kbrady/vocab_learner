@@ -97,15 +97,19 @@ class deck:
 			return
 		self.next_up = [self.next_up[0], card] + self.next_up[1:]
 	
+	def num_not_known(self):
+		return len([x for x in self.word_card_map.values() if x.progress <= 6])
+	
 	def get_next(self):
 		if len(self.next_up) == 0:
 			self.next_up = [x for x in self.word_card_map.values() if x.next_schedule <= datetime.now()]
-		if len(self.to_add) > 0 and len(self.next_up) == 0:
+		if len(self.to_add) > 0 and len(self.next_up) == 0 and self.num_not_known() < 20:
 			self.add_word()
 			self.next_up = [x for x in self.word_card_map.values() if x.next_schedule <= datetime.now()]
 		if len(self.next_up) == 0:
 			self.done = True
 			return null_card()
+		self.done = False
 		return self.next_up.pop(0)
 	
 	def add_word(self):
@@ -132,6 +136,9 @@ class card:
 	def __repr__(self):
 		return self.word.__repr__()
 	
+	def correct(self, word_guessed):
+		return word_guessed == self.word.text
+	
 	def get_word_pair(self):
 		return (self.word.text, self.word.meaning, self.word.num_times_seen)
 	
@@ -140,7 +147,7 @@ class card:
 		self.word.meaning = new_meaning
 	
 	def delete(self):
-		self.parent.next_up = [x for x in self.parent.next_up if x != self]
+		self.parent_deck.next_up = [x for x in self.parent_deck.next_up if x != self]
 		del self.parent_deck.word_card_map[self.word.meaning]
 		del self.word
 
@@ -149,6 +156,7 @@ class card:
 			self.progress += 1
 		else:
 			self.progress = 0
+			self.parent_deck.review(self)
 		self.next_schedule = datetime.now() + card.time_steps[self.progress]
 
 class null_card:
@@ -157,11 +165,17 @@ class null_card:
 	
 	def update(self):
 		return None
+	
+	def correct(self, word_guessed):
+		return True
 
 class null_word:
 	def __init__(self):
-		self.meanting = "Enough practice, go to sleep"
+		self.meaning = "Enough practice, go to sleep"
 		self.text = "Enough practice, go to sleep"
+	
+	def update_stats(self, correct):
+		return None
 	
 def main(savefile, lang='tr-TR'):
 	if os.path.exists(savefile):
