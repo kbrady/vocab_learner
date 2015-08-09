@@ -79,7 +79,7 @@ def login_page():
 def login(user_name, lang='tr-TR'):
 	global word_list
 	savefile = user_name+'.pdeck'
-	word_list = leitner.main(savefile, lang)
+	word_list = pimsleur.main(savefile, lang)
 	return redirect('/')
 
 @app.route('/edit')
