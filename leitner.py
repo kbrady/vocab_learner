@@ -5,7 +5,6 @@ import pickle
 import math
 from datetime import timedelta, datetime
 import csv
-import analyze
 import random
 from word import word
 
