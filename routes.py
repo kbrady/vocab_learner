@@ -43,7 +43,7 @@ class word_progress:
 			self.next_schedule = time_to_streak(next_schedule)
 
 def time_to_streak(this_time):
-	if datetime.datetime.now() - this_time < datetime.timedelta(days=1):
+	if abs(datetime.datetime.now() - this_time) < datetime.timedelta(hours=10):
 		return this_time.strftime("%I:%M %p")
 	else:
 		return this_time.strftime("%b %d")
