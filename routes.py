@@ -25,7 +25,10 @@ class word_pair:
 		return self.__repr__()
 
 class word_progress:
+	index = 1
 	def __init__(self, text, box='', times_seen=0, times_correct=0, longest_streak=0, current_streak=0, last_seen=None, next_schedule=None):
+		self.index = word_progress.index
+		word_progress.index += 1
 		self.text = text
 		self.box = box
 		self.times_seen = times_seen
@@ -153,6 +156,7 @@ def language_page():
 def progress_page():
 	if word_list is None:
 		return redirect('/login')
+	word_progress.index = 1
 	seen_words = [word_progress(x.word.text, x.progress+1, x.word.num_times_seen, x.word.num_times_correct, x.word.longest_streak, x.word.current_streak, x.word.last_seen, x.next_schedule) for x in word_list.get_deck_list()]
 	unseen_words = [word_progress(x[0]) for x in word_list.to_add]
 	return render_template('progress.html', words = seen_words + unseen_words)
@@ -161,6 +165,7 @@ def progress_page():
 def see_next_up():
 	if word_list is None:
 		return redirect('/login')
+	word_progress.index = 1
 	next_words = [word_progress(x.word.text, x.progress+1, x.word.num_times_seen, x.word.num_times_correct, x.word.longest_streak, x.word.current_streak, x.word.last_seen, x.next_schedule) for x in word_list.next_up]
 	return render_template('progress.html', words = next_words)
 

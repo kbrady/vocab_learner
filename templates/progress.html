@@ -5,6 +5,7 @@
 <table id='editTable'>
 <thead>
 <tr>
+<th>Index</th>
 <th>Word</th>
 <th>Box</th>
 <th>Number of Times Seen</th>
@@ -18,6 +19,7 @@
 <tbody>
 {% for w in words %}
 <tr>
+<td>{{w.index}}</td>
 <td>{{w.text}}</td>
 <td>{{w.box}}</td>
 <td>{{w.times_seen}}</td>
