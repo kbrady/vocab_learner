@@ -10,8 +10,9 @@ from word import word
 
 # define the deck
 class deck:
-	def __init__(self, lang='tr-TR', savefile=None):
+	def __init__(self, lang='tr-TR', max_learn = 20, savefile=None):
 		self.lang = lang
+		self.learn_in_hour = max_learn
 		self.savefile = savefile
 		self.word_card_map = {}
 		self.next_up = []
@@ -103,7 +104,7 @@ class deck:
 	def get_next(self):
 		if len(self.next_up) == 0:
 			self.next_up = [x for x in self.word_card_map.values() if x.next_schedule <= datetime.now()]
-		if len(self.to_add) > 0 and len(self.next_up) == 0 and self.num_not_known() < 20:
+		if len(self.to_add) > 0 and len(self.next_up) == 0 and self.num_not_known() < self.learn_in_hour:
 			self.add_word()
 			self.next_up = [x for x in self.word_card_map.values() if x.next_schedule <= datetime.now()]
 		if len(self.next_up) == 0:
@@ -179,11 +180,11 @@ class null_word:
 	def update_stats(self, correct):
 		return None
 	
-def main(savefile, lang='tr-TR'):
+def main(savefile, lang='tr-TR', max_learn = 20):
 	if os.path.exists(savefile):
 		with open(savefile, 'rb') as f:
 			word_list = pickle.load(f)
 			word_list.savefile = savefile
 	else:
-		word_list = deck(lang, savefile)
+		word_list = deck(lang, max_learn, savefile)
 	return word_list

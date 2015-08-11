@@ -88,10 +88,13 @@ def login_page():
 	return login(request.form['user'], request.form['lang'])
 
 @app.route('/login/<user_name>', methods=['GET', 'POST'])
-def login(user_name, lang='tr-TR'):
+def login(user_name):
+	print 'test'
 	global word_list
 	savefile = user_name+'.pdeck'
-	word_list = pimsleur.main(savefile, lang)
+	lang = request.form.get('lang','tr-TR')
+	max_learn = request.form.get('max_learn',20)
+	word_list = pimsleur.main(savefile, lang, max_learn)
 	return redirect('/')
 
 @app.route('/edit')
@@ -142,13 +145,14 @@ def download_csv_page():
 	word_list.write_words_to_csv(request.form['filename'])
 	return redirect('/')
 
-@app.route('/language', methods=['GET', 'POST'])
+@app.route('/settings', methods=['GET', 'POST'])
 def language_page():
 	if word_list is None:
 		return redirect('/login')
 	if 'lang' not in request.form:
-		return render_template('language.html', languages = languages)
+		return render_template('language.html', languages = languages, max_learn = word_list.learn_in_hour)
 	word_list.lang = request.form['lang']
+	word_list.learn_in_hour = request.form['max_learn']
 	word_list.save()
 	return redirect('/')
 

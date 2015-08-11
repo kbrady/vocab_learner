@@ -2,12 +2,15 @@
 {% block content %}
 
 <h4>Choose a Language for Answers to be Read in:</h4>
-<form action="/language" method=post autocomplete="off">
+<form action="/settings" method=post autocomplete="off">
 voice language: <select id="lang_list" name="lang">
 {% for l in languages %}
 	<option value="{{l}}">{{l}}</option>
 {% endfor %}
 </select>
+<br/>
+Number of new words you can learn per hour:
+<input type="text" value="{{max_learn}}" name="max_learn">
 <br/>
 <input type="submit" value="submit">
 </form>
