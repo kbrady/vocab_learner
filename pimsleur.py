@@ -57,7 +57,12 @@ class deck:
 	
 	def change_word(self, new_text, new_meaning, old_text, old_meaning):
 		if old_meaning in self.word_card_map:
-			self.word_card_map[old_meaning].edit_word(new_text, new_meaning)
+			# edit existing word and move it in the mapping
+			c = self.word_card_map.pop(old_meaning)
+			while new_meaning in self.word_card_map:
+				new_meaning += ' 2'
+			c.edit_word(new_text, new_meaning)
+			self.word_card_map[new_meaning] = c
 			return
 		for i in range(len(self.to_add)):
 			pair = self.to_add[i]
