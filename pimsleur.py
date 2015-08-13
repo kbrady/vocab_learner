@@ -37,9 +37,9 @@ class deck:
 	
 	def add_to_add(self, text, meaning):
 		if type(text) == unicode:
-			pair = (text, meaning) 
+			pair = (text, ''.join([c for c in meaning if ord(c) < 128])) 
 		else:
-			pair = (unicode(text, 'utf-8'), meaning) 
+			pair = (unicode(text, 'utf-8'), ''.join([c for c in meaning if ord(c) < 128])) 
 		if pair not in self.to_add:
 			self.to_add.append(pair)
 	
@@ -150,7 +150,7 @@ class card:
 	
 	def edit_word(self, new_text, new_meaning):
 		self.word.text = new_text
-		self.word.meaning = new_meaning
+		self.word.meaning = str(new_meaning)
 	
 	def delete(self):
 		self.parent_deck.next_up = [x for x in self.parent_deck.next_up if x != self]
