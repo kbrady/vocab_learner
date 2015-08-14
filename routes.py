@@ -170,7 +170,7 @@ def see_next_up():
 	if word_list is None:
 		return redirect('/login')
 	word_progress.index = 1
-	next_words = [word_progress(x.word.text, x.progress+1, x.word.num_times_seen, x.word.num_times_correct, x.word.longest_streak, x.word.current_streak, x.word.last_seen, x.next_schedule) for x in word_list.next_up]
+	next_words = [word_progress(x.word.text, x.progress+1, x.word.num_times_seen, x.word.num_times_correct, x.word.longest_streak, x.word.current_streak, x.word.last_seen, x.next_schedule) for x in word_list.schedule_manager.queue]
 	return render_template('progress.html', words = next_words)
 
 if __name__ == '__main__':

@@ -7,6 +7,23 @@ from datetime import timedelta, datetime
 import csv
 import random
 from word import word
+import heapq
+
+class PriorityQueue():
+	def __init__(self):
+		self.queue = []
+	
+	def put(self, item):
+		heapq.heappush(self.queue, item)
+	
+	def get(self):
+		return heapq.heappop(self.queue)
+	
+	def peek(self):
+		return self.queue[0]
+	
+	def empty(self):
+		return len(self.queue) == 0
 
 # define the deck
 class deck:
@@ -15,9 +32,12 @@ class deck:
 		self.learn_in_hour = max_learn
 		self.savefile = savefile
 		self.word_card_map = {}
-		self.next_up = []
 		self.to_add = []
+		self.current_card = None
+		self.schedule_manager = PriorityQueue()
+		self.next_up = []
 		self.done = False
+		self.num_not_known = 0
 	
 	def completed(self):
 		return self.done
@@ -88,35 +108,55 @@ class deck:
 		with open(savefile, 'wb') as f:
 			pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 	
+	def schedule(self, card):
+		self.schedule_manager.put((card.next_schedule, card))
+	
 	def review(self, card):
 		if len(self.next_up) == 0:
 			next_card = self.get_next()
 			if next_card == card:
 				self.next_up = [card]
 				return
-			self.next_up = [next_card, card] + self.next_up
+			self.next_up = [next_card, card]
 			return
-		if len(self.next_up) == 1:
-			if self.next_up[0] == card:
-				return
-			self.next_up.append(card)
+		if self.next_up[0] == card:
 			return
-		self.next_up = [self.next_up[0], card] + self.next_up[1:]
+		self.next_up.append(card)
+		return
 	
-	def num_not_known(self):
-		return len([x for x in self.word_card_map.values() if x.progress <= 5])
+	def try_to_pop_from_schedule_manager(self):
+		if self.current_card is not None and not self.current_card.deleted and self.current_card.progress is not None:
+			return
+		self.current_card = self.schedule_manager.get()[1]
+		self.done = False
+		if self.current_card.next_schedule > datetime.now():
+			self.schedule(self.current_card)
+			self.done = True
+			self.current_card = null_card()
+	
+	def set_current_card(self):
+		# you don't need to update cards which were deleted or are the null card
+		if self.current_card is None or self.current_card.deleted or self.current_card.progress is None:
+			self.current_card = None
+		# stopped program without updating current card
+		if self.current_card is not None:
+			return
+		# there are cards to review
+		if len(self.next_up) > 0:
+			self.current_card = self.next_up.pop(0)
+			return
+		self.try_to_pop_from_schedule_manager()
+		# cards need to be added
+		if self.current_card.progress is not None and len(self.to_add) > 0 and self.num_not_known < self.learn_in_hour:
+			self.add_word()
+		self.try_to_pop_from_schedule_manager()
 	
 	def get_next(self):
-		if len(self.next_up) == 0:
-			self.next_up = [x for x in self.word_card_map.values() if x.next_schedule <= datetime.now()]
-		if len(self.to_add) > 0 and len(self.next_up) == 0 and self.num_not_known() < self.learn_in_hour:
-			self.add_word()
-			self.next_up = [x for x in self.word_card_map.values() if x.next_schedule <= datetime.now()]
-		if len(self.next_up) == 0:
-			self.done = True
-			return null_card()
-		self.done = False
-		return self.next_up.pop(0)
+		self.set_current_card()
+		# handeling deleted words
+		while self.current_card.deleted:
+			self.set_current_card()
+		return self.current_card
 	
 	def add_word(self):
 		pair = self.to_add.pop(0)
@@ -130,14 +170,18 @@ class deck:
 		card(self, w)
 
 class card:
+	EARLY_PROGRESS = 5
 	time_steps = [timedelta(seconds=0), timedelta(seconds=5), timedelta(seconds=25), timedelta(minutes=2), timedelta(minutes=10), timedelta(hours=1), timedelta(hours=5), timedelta(days=1), timedelta(days=5), timedelta(days=25)]
 	
 	def __init__(self, parent_deck, word):
-		self.parent_deck = parent_deck
 		self.word = word
-		self.parent_deck.word_card_map[self.word.meaning] = self
 		self.next_schedule = datetime.now()
 		self.progress = 0
+		self.deleted = False
+		# set up relationship with deck
+		self.parent_deck = parent_deck
+		self.parent_deck.word_card_map[self.word.meaning] = self
+		self.parent_deck.schedule(self)
 	
 	def __repr__(self):
 		return self.word.__repr__()
@@ -153,23 +197,31 @@ class card:
 		self.word.meaning = str(new_meaning)
 	
 	def delete(self):
-		self.parent_deck.next_up = [x for x in self.parent_deck.next_up if x != self]
 		del self.parent_deck.word_card_map[self.word.meaning]
 		del self.word
+		self.deleted = True
 
 	def update(self):
+		self.parent_deck.current_card = None
 		if self.word.correct_last_time:
 			self.progress += 1
+			if self.progress > card.EARLY_PROGRESS:
+				self.parent_deck.num_not_known -= 1
 			if self.progress == len(card.time_steps):
-				self.progress -= 1
+				self.progress = len(card.time_steps) - 1
 		else:
 			self.progress = 0
+			self.parent_deck.num_not_known += 1
 			self.parent_deck.review(self)
+			return
 		self.next_schedule = datetime.now() + card.time_steps[self.progress]
+		self.parent_deck.schedule(self)
 
 class null_card:
 	def __init__(self):
 		self.word = null_word()
+		self.deleted = False
+		self.progress = None
 	
 	def update(self):
 		return None
