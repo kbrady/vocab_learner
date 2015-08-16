@@ -152,7 +152,7 @@ class deck:
 			return
 		self.try_to_pop_from_schedule_manager()
 		# cards need to be added
-		if (self.current_card is None or self.current_card.progress) is None and len(self.to_add) > 0 and self.num_not_known < self.learn_in_hour:
+		if (self.current_card is None or self.current_card.progress is None) and len(self.to_add) > 0 and self.num_not_known < self.learn_in_hour:
 			self.add_word()
 		self.try_to_pop_from_schedule_manager()
 	
