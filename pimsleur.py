@@ -114,15 +114,16 @@ class deck:
 	def review(self, card):
 		if len(self.next_up) == 0:
 			next_card = self.get_next()
+			self.current_card = None
 			if next_card == card:
 				self.next_up = [card]
 				return
 			self.next_up = [next_card, card]
 			return
-		if self.next_up[0] == card:
+		elif self.next_up[0] == card:
 			return
-		self.next_up.append(card)
-		return
+		else:
+			self.next_up = [self.next_up[0], card] + self.next_up[1:]
 	
 	def try_to_pop_from_schedule_manager(self):
 		if self.current_card is not None and not self.current_card.deleted and self.current_card.progress is not None:
@@ -147,7 +148,7 @@ class deck:
 			return
 		self.try_to_pop_from_schedule_manager()
 		# cards need to be added
-		if self.current_card.progress is not None and len(self.to_add) > 0 and self.num_not_known < self.learn_in_hour:
+		if (self.current_card is None or self.current_card.progress) is None and len(self.to_add) > 0 and self.num_not_known < self.learn_in_hour:
 			self.add_word()
 		self.try_to_pop_from_schedule_manager()
 	
