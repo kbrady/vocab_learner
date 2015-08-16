@@ -79,13 +79,11 @@ def home():
 	else:
 		return render_template('home.html', meaning=root.word.meaning, word='', completed=completed, say=to_say, lang=word_list.lang)
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login')
 def login_page():
-	if 'user' not in request.form:
-		saved_files = glob.glob('*.pdeck')
-		saved_files = [x[:x.rfind('.')] for x in saved_files]
-		return render_template('login.html', languages=languages, saved_files = saved_files)
-	return login(request.form['user'], request.form['lang'])
+	saved_files = glob.glob('*.pdeck')
+	saved_files = [x[:x.rfind('.')] for x in saved_files]
+	return render_template('login.html', languages=languages, saved_files = saved_files)
 
 @app.route('/login/<user_name>', methods=['GET', 'POST'])
 def login(user_name):

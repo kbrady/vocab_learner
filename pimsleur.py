@@ -126,6 +126,10 @@ class deck:
 			self.next_up = [self.next_up[0], card] + self.next_up[1:]
 	
 	def try_to_pop_from_schedule_manager(self):
+		if self.schedule_manager.empty():
+			self.done = True
+			self.current_card = null_card()
+			return
 		if self.current_card is not None and not self.current_card.deleted and self.current_card.progress is not None:
 			return
 		self.current_card = self.schedule_manager.get()[1]
@@ -148,7 +152,7 @@ class deck:
 			return
 		self.try_to_pop_from_schedule_manager()
 		# cards need to be added
-		if (self.current_card is None or self.current_card.progress) is None and len(self.to_add) > 0 and self.num_not_known < self.learn_in_hour:
+		if (self.current_card is None or self.current_card.progress is None) and len(self.to_add) > 0 and self.num_not_known < self.learn_in_hour:
 			self.add_word()
 		self.try_to_pop_from_schedule_manager()
 	
