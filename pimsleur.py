@@ -126,6 +126,10 @@ class deck:
 			self.next_up = [self.next_up[0], card] + self.next_up[1:]
 	
 	def try_to_pop_from_schedule_manager(self):
+		if self.schedule_manager.empty():
+			self.done = True
+			self.current_card = null_card()
+			return
 		if self.current_card is not None and not self.current_card.deleted and self.current_card.progress is not None:
 			return
 		self.current_card = self.schedule_manager.get()[1]

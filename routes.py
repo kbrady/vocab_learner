@@ -85,7 +85,7 @@ def login_page():
 		saved_files = glob.glob('*.pdeck')
 		saved_files = [x[:x.rfind('.')] for x in saved_files]
 		return render_template('login.html', languages=languages, saved_files = saved_files)
-	return login(request.form['user'], request.form['lang'])
+	return login(request.form['user'])#, request.form['lang'])
 
 @app.route('/login/<user_name>', methods=['GET', 'POST'])
 def login(user_name):
