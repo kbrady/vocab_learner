@@ -176,7 +176,7 @@ class deck:
 
 class card:
 	EARLY_PROGRESS = 5
-	time_steps = [timedelta(seconds=0), timedelta(seconds=5), timedelta(seconds=25), timedelta(minutes=2), timedelta(minutes=10), timedelta(hours=1), timedelta(hours=5), timedelta(days=1), timedelta(days=5), timedelta(days=25)]
+	time_steps = [timedelta(seconds=0), timedelta(seconds=5), timedelta(seconds=25), timedelta(minutes=2), timedelta(minutes=10), timedelta(hours=1), timedelta(hours=5), timedelta(days=1), timedelta(days=5), timedelta(days=25), timedelta(weeks=16)]
 	
 	def __init__(self, parent_deck, word):
 		self.word = word
