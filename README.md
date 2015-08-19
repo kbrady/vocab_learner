@@ -17,4 +17,7 @@ When you notice mistakes in the data you can edit the words in the program. This
 
 You can click on the progress tab to see how you are doing.
 
-Words are selected for review using the leitner method. Whenever you get a word wrong it is reviewed imediately after looking at one other word.
+Words are selected for review using the pimsleur method. Whenever you get a word wrong it is reviewed imediately after looking at one other word.
+
+You can edit the language that words are read in and how many new words can be introduced in an hour in the change settings tab.
+Words are only added if you are upto date on reviewing words you already learned.
