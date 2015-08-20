@@ -4,3 +4,6 @@
 *.deck
 *.pdeck
 *.csv
+
+# Virtual Env
+venv

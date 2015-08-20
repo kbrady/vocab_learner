@@ -1,10 +1,15 @@
-# Vocabulary Learner
-## Python script which uses Google's text to speech to teach vocabulary incorporating audio
+## Vocabulary Learner
 
-How to use:
-Run
-python routes.py
-point your browser (works best on Chrome or Safari) to 0.0.0.0:5000
+Python script which uses Google's text to speech to teach vocabulary incorporating audio
+
+#### How to use
+* Install requirements
+  * `pip install -r requirements.txt`
+* Run
+  * `python routes.py`
+* Point your browser (works best on Chrome or Safari) to 0.0.0.0:5000
+
+#### Details
 
 When prompted choose a user name (this names the file where your work is stored in user_name.deck)
 
