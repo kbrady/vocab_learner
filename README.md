@@ -6,7 +6,7 @@ Run
 python routes.py
 point your browser (works best on Chrome or Safari) to 0.0.0.0:5000
 
-When prompted choose a user name (this names the file where your work is stored in user_name.deck)
+When prompted choose a user name (this names the file where your work is stored in user_name.pdeck)
 
 Upload a unicode csv with the words you want to learn in the first column and their meanings in the right column (no headers).
 The easiest way to make this csv is using Google Sheets. You can upload a list of the words you want to learn.
