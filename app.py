@@ -3,8 +3,43 @@ from flask import Flask, render_template, request, jsonify, Markup, redirect, ur
 import pimsleur
 import glob
 import datetime
+from flask.ext.mongoengine import MongoEngine, MongoEngineSessionInterface
+from flask.ext.mongoengine.wtf import model_form
+from wtforms.fields import PasswordField
+from flask.ext.bcrypt import Bcrypt
 
-app = Flask(__name__)
+
+# Create and configure the app
+
+app = Flask('Vocabulary')
+app.config['MONGODB_SETTINGS'] = {
+	'db': 'vocabulary'
+}
+db = MongoEngine(app)
+app.session_interface = MongoEngineSessionInterface(db)
+app.jinja_env.add_extension('pyjade.ext.jinja.PyJadeExtension')
+bcrypt = Bcrypt(app)
+
+
+# Models
+
+class User(db.Document):
+	username = db.StringField(required=True)
+	hashed_pw = db.StringField(required=True)
+
+
+# Forms
+
+user_form = model_form(User, exclude=['hashed_pw'])
+
+class RegisterForm(user_form):
+	password = PasswordField('Password')
+
+class SigninForm(user_form):
+	password = PasswordField('Password')
+
+# Helpers
+
 show_word = False
 word_list = None
 root = None
@@ -47,6 +82,37 @@ def time_to_streak(this_time):
 		return this_time.strftime("%I:%M %p")
 	else:
 		return this_time.strftime("%b %d")
+
+
+# Routes
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+	form = RegisterForm(request.form, secret_key='random_secret_key')
+	if request.method == 'POST':
+		username = form.username.data
+		password = form.password.data
+		hashed_pw = bcrypt.generate_password_hash(password)
+		user = User(username, hashed_pw)
+		user.save()
+		return redirect('/')
+	return render_template('user/register.jade')
+
+@app.route('/signin', methods=['GET', 'POST'])
+def signin():
+	form = SigninForm(request.form, secret_key='random_secret_key')
+	if request.method == 'POST':
+		username = form.username.data
+		password = form.password.data
+		user = User.objects.filter(username=username).first()
+		if not user:
+			print('no user')
+			return render_template('user/signin.jade')
+		if not bcrypt.check_password_hash(user.hashed_pw, password):
+			print('incorrect password')
+			return render_template('user/signin.jade')
+		return redirect('/')
+	return render_template('user/signin.jade')
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -170,6 +236,9 @@ def see_next_up():
 	word_progress.index = 1
 	next_words = [word_progress(x[1].word.text, x[1].progress+1, x[1].word.num_times_seen, x[1].word.num_times_correct, x[1].word.longest_streak, x[1].word.current_streak, x[1].word.last_seen, x[1].next_schedule) for x in word_list.schedule_manager.queue]
 	return render_template('progress.html', words = next_words)
+
+
+# Run server
 
 if __name__ == '__main__':
 	app.run(debug=True, host='0.0.0.0')

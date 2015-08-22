@@ -1,0 +1,14 @@
+extends layout.html
+block content
+	form.form-horizontal(name="signin", action="/signin", method="post")
+		.form-group
+			label.col-sm-2.control-label Username
+			.col-sm-10
+				input(type="text", name="username")
+		.form-group
+			label.col-sm-2.control-label Password
+			.col-sm-10
+				input(type="password", name="password")
+		.form-group
+			.col-sm-offset-2.col-sm-10
+				button.btn.btn-default(type="submit", name="register") Signin
