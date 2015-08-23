@@ -153,6 +153,11 @@ def login_page():
 	saved_files = [x[:x.rfind('.')] for x in saved_files]
 	return render_template('login.html', languages=languages, saved_files = saved_files)
 
+@app.route('/login', methods=['POST'])
+def login_post():
+	print('this needs to be fixed')
+	return redirect('/')
+
 @app.route('/login/<user_name>', methods=['GET', 'POST'])
 def login(user_name):
 	print 'test'
