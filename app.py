@@ -14,6 +14,7 @@ import os
 
 app = Flask('Vocabulary')
 app.config['MONGODB_SETTINGS'] = {
+	'host': os.environ.get('MONGOLAB_URI') or 'mongodb://localhost/vocabulary',
 	'db': 'vocabulary'
 }
 db = MongoEngine(app)
