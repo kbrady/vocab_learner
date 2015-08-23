@@ -7,6 +7,7 @@ from flask.ext.mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask.ext.mongoengine.wtf import model_form
 from wtforms.fields import PasswordField
 from flask.ext.bcrypt import Bcrypt
+import os
 
 
 # Create and configure the app
@@ -241,4 +242,5 @@ def see_next_up():
 # Run server
 
 if __name__ == '__main__':
-	app.run(debug=True, host='0.0.0.0')
+	port = int(os.environ.get('PORT', 5000))
+	app.run(debug=True, host='0.0.0.0', port=port)
