@@ -6,7 +6,7 @@ Python script which uses Google's text to speech to teach vocabulary incorporati
 * Install requirements
   * `pip install -r requirements.txt`
 * Run
-  * `python routes.py`
+  * `python app.py`
 * Point your browser (works best on Chrome or Safari) to 0.0.0.0:5000
 
 #### Details
