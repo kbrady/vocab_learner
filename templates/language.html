@@ -2,7 +2,7 @@
 {% block content %}
 
 <h4>Choose a Language for Answers to be Read in:</h4>
-<form action="/settings" method=post autocomplete="off">
+<form action="/settings" method="post" autocomplete="off">
 voice language: <select id="lang_list" name="lang">
 {% for l in languages %}
 	<option value="{{l}}">{{l}}</option>
