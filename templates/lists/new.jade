@@ -1,0 +1,10 @@
+extends layout.html
+block content
+  form.form-horizontal(name="lists_new", action="/lists", method="post")
+    .form-group
+      label.col-sm-2.control-label List Name
+      .col-sm-10
+        input(type="text", name="name")
+    .form-group
+      .col-sm-offset-2.col-sm-10
+        button.btn.btn-default(type="submit") Create

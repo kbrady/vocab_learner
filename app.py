@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, request, jsonify, Markup, redirect, url_for
+from flask import Flask, render_template, request, jsonify, Markup, redirect, url_for, session
 import pimsleur
 import glob
 import datetime
@@ -29,16 +29,36 @@ class User(db.Document):
 	username = db.StringField(required=True)
 	hashed_pw = db.StringField(required=True)
 
+class Data(db.EmbeddedDocument):
+	correct_last_time = db.BooleanField()
+	current_streak = db.IntField()
+	first_time_seen = db.DateTimeField()
+	last_time_seen = db.DateTimeField()
+
+class Word(db.EmbeddedDocument):
+	word = db.StringField()
+	translation = db.StringField()
+	data = db.EmbeddedDocumentField(Data)
+
+class List(db.Document):
+	user = db.ReferenceField(User)
+	name = db.StringField()
+	words = db.ListField(db.EmbeddedDocumentField(Word))
+
 
 # Forms
 
-user_form = model_form(User, exclude=['hashed_pw'])
+UserForm = model_form(User, exclude=['hashed_pw'])
 
-class RegisterForm(user_form):
+class RegisterForm(UserForm):
 	password = PasswordField('Password')
 
-class SigninForm(user_form):
+class SigninForm(UserForm):
 	password = PasswordField('Password')
+
+ListForm = model_form(List, exclude=['user', 'words'])
+WordForm = model_form(Word, exclude=['data'])
+
 
 # Helpers
 
@@ -88,6 +108,32 @@ def time_to_streak(this_time):
 
 # Routes
 
+@app.route('/lists')
+def lists_index():
+	if session['signedin']:
+		username = session['signedin']
+		user = User.objects.filter(username=username).first()
+		# Show the lists of user
+		return redirect('/')
+	else:
+		print 'no user signed in'
+		return redirect('/signin')
+
+@app.route('/lists/new', methods=['GET'])
+def lists_new():
+	form = ListForm(request.form, secret_key='random_secret_key')
+	return render_template('lists/new.jade')
+
+@app.route('/lists', methods=['POST'])
+def lists_create():
+	form = ListForm(request.form, secret_key='random_secret_key')
+	name = form.name.data
+	username = session['signedin']
+	user = User.objects.filter(username=username).first()
+	list = List(user, name)
+	list.save()
+	return redirect('/lists')
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
 	form = RegisterForm(request.form, secret_key='random_secret_key')
@@ -113,8 +159,12 @@ def signin():
 		if not bcrypt.check_password_hash(user.hashed_pw, password):
 			print('incorrect password')
 			return render_template('user/signin.jade')
+		session['signedin'] = username
 		return redirect('/')
 	return render_template('user/signin.jade')
+
+
+# These do not use database
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
