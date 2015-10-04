@@ -163,11 +163,19 @@ def signin():
 		return redirect('/')
 	return render_template('user/signin.jade')
 
+@app.route('/logout')
+def logout():
+	session['signedin'] = None
+	return redirect('/')
 
 # These do not use database
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
+	signed_in = None
+	if 'signedin' in session:
+		signed_in = session['signedin']
+	return render_template('user/home.jade', signed_in=signed_in)
 	if word_list is None:
 		return redirect('/login')
 	if len(word_list.word_card_map) + len(word_list.to_add) == 0:
